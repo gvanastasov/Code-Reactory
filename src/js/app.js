@@ -6,7 +6,3 @@ var app = new Vue({
         console.log('vue testing');
     }
 });
-
-console.log('hey');
-console.log('hey');
-console.log('hey');
