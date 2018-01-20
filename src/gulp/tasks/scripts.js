@@ -1,6 +1,12 @@
-var config = require('../config.js');
+const configPath = '../config.js';
+
+var config     = require(configPath),
+    browserify = require('browserify'),
+    source     = require('vinyl-source-stream');
 
 module.exports = function(gulp, plugins){
-    gulp.src(config.paths.js.src + 'main.js')
+    browserify(config.paths.js.src + 'main.js')
+    .bundle()
+    .pipe(source('main.js'))
     .pipe(gulp.dest(config.paths.js.dist));
 }
