@@ -1,10 +1,12 @@
 import Vue from 'vue';
 
-window.addEventListener('load', function() {
-    var app = new Vue({
-        el: '#app',
-        mounted: function(){
-            console.log('vue testing');
-        }
-    });
+var app = new Vue({
+    el: '#app',
+    mounted: function(){
+        console.log('vue testing');
+    }
 });
+
+console.log('hey');
+console.log('hey');
+console.log('hey');

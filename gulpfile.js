@@ -15,13 +15,10 @@ gulp.task('sass',    getTask('sass'));
 
 gulp.task('build',   ['scripts', 'sass']);
 
-gulp.task('watch-js', function(){
+gulp.task('watch', function(){
     gulp.watch(config.paths.js.src + '**/*.js', ['scripts']);
-});
-gulp.task('watch-sass', function(){
     gulp.watch(config.paths.css.src + '**/*.{sass,scss}', ['sass']);
 });
-gulp.task('watch', ['watch-js', 'watch-sass']);
 
 function getTask(name) {
     return require(config.paths.tasks + name)(gulp, plugins);
