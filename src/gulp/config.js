@@ -9,5 +9,6 @@ module.exports = {
             src: './src/css/',
             dist: './dist/'
         }
-    }
+    },
+    vendors: ['vue', 'gl-matrix']
 }

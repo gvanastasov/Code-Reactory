@@ -11,8 +11,12 @@ module.exports = function(gulp, plugins){
     browserify({
         global: true,
         entries: config.paths.js.src + 'app.js',
-        transform: [vueify, babelify, envify({ NODE_ENV: 'production' })] 
     })
+    .external(config.vendors)
+    .transform([
+        vueify, 
+        babelify, 
+        envify({ NODE_ENV: 'production' })]) 
     .bundle()
     .pipe(source('main.js'))
     .pipe(gulp.dest(config.paths.js.dist));
