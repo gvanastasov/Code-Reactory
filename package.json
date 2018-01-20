@@ -2,13 +2,20 @@
   "name": "code_reactory",
   "version": "1.0.0",
   "description": "personal company webpage",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/gvanastasov/Code-Reactory"
+  },
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "gulp": "gulp default"
   },
   "author": "Georgi Anastasov",
   "license": "ISC",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-sass": "^3.1.0"
   }
 }
