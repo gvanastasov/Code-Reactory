@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>PhotoGenic</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet">
+
+    <!-- MATH Libraries //-->
+<script type='text/javascript' src='js/math/gl-matrix-min.js'></script>
+<!-- WEBGL Libraries //-->
+<script type='text/javascript' src='js/webgl/Globals.js'></script>
+<script type='text/javascript' src='js/webgl/Utils.js'></script>
+<script type='text/javascript' src='js/webgl/Program.js'></script>
+<script type='text/javascript' src='js/webgl/Scene.js'></script>
+<script type='text/javascript' src='js/webgl/Axis.js'></script>
+<script type='text/javascript' src='js/webgl/Floor.js'></script>
+<script type='text/javascript' src='js/webgl/Camera.js'></script>
+<script type='text/javascript' src='js/webgl/CameraInteractor.js'></script>
+<script type='text/javascript' src='js/webgl/SceneTransforms.js'></script>
+<script type='text/javascript' src='js/webgl/WebGLApp.js'></script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec4 aVertexColor;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat4 uNMatrix;
+    uniform bool uUpdateLight;
+    uniform vec3 uLightPosition; 
+    uniform vec4 uLightAmbient;  
+    uniform vec4 uLightDiffuse;  
+    uniform vec4 uMaterialDiffuse;
+    uniform bool uWireframe;
+    uniform bool uPerVertexColor;
+    
+    varying vec4 vFinalColor;
+    
+    void main(void) {
+    
+        if (uWireframe) {
+            if (uPerVertexColor){
+                vFinalColor = aVertexColor;
+            }
+            else{
+                vFinalColor = uMaterialDiffuse;
+            }
+        }
+        else{
+            vec3 N = vec3(uNMatrix * vec4(aVertexNormal, 0.0));  // This is a vector w = 0;
+            vec3 L = normalize(-uLightPosition);                 // Given a light position, use the inverse is the direction (to the center of the world)
+            if(uUpdateLight){
+                L = vec3(uNMatrix*vec4(L,0.0));   // vector light direction
+            }
+            
+            float lambertTerm = dot(N,-L);
+            if (lambertTerm == 0.0) lambertTerm = 0.01;
+            vec4 Ia = uLightAmbient;
+            vec4 Id = uMaterialDiffuse * uLightDiffuse * lambertTerm;
+            vFinalColor = Ia + Id;
+            vFinalColor.a = 1.0;
+        }
+        
+        //Transformed vertex position
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0); // vertex w=1
+        
+    }
+    </script>
+    
+    <script id="shader-fs" type="x-shader/x-fragment">
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+    
+    varying vec4  vFinalColor;
+    
+    void main(void)  {
+     gl_FragColor = vFinalColor;
+    }
+    </script>
+
+    <script id='code-js' type="text/javascript">
+        
+        /**
+        *  Configures the gl context
+        */
+        var camera = null;
+        var interactor = null;
+        var transforms = null;
+        
+        function configure(){
+            
+            gl.clearColor(0, 0, 0, 0);
+            gl.clearDepth(100.0);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+            
+            //Creates and sets up the camera location
+            camera = new Camera(CAMERA_ORBIT_TYPE);
+            camera.goHome([0,50,400]);
+            camera.hookRenderer = draw;
+            
+            //Creates and sets up the mouse and keyboard interactor
+            var canvas = document.getElementById('canvas-element-id');
+            interactor = new CameraInteractor(camera, canvas);
+            
+            //Scene Transforms
+            transforms = new SceneTransforms(camera);
+
+            transforms.init();
+
+            //Update lights for this example
+            gl.uniform4fv(prg.uLightAmbient,      [0.1,0.1,0.1,1.0]);
+            gl.uniform3fv(prg.uLightPosition,    [0, 0, 2120]);
+            gl.uniform4fv(prg.uLightDiffuse,      [0.7,0.7,0.7,1.0]);
+            
+            //init gui with camera settings
+            // initGUIWithCameraSettings();
+            
+            //init transforms
+            // initTransforms();
+        }
+        
+        
+        /**
+        * Loads the scene
+        */
+        function load(){
+            // Floor.build(2000,100);
+            // Axis.build(2000);
+            // Scene.addObject(Floor);
+            // Scene.addObject(Axis);
+            Scene.loadObject('../geometry/teapot.json','cr_logo');
+        }
+        
+        /**
+        * invoked on every rendering cycle
+        */
+        function draw() {
+            gl.viewport(0, 0, c_width, c_height);
+            // some options to try...
+            //gl.viewport(0, 0, c_width/2, c_height/2);
+            //gl.viewport(c_width/2,c_height/2, c_width, c_height);
+            //gl.viewport(50, 50, c_width-100, c_height-100);
+        
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            transforms.updatePerspective();
+
+            try{
+
+                gl.uniform1i(prg.uUpdateLight,updateLightPosition);
+                
+                for (var i = 0; i < Scene.objects.length; i++){
+                    
+                    var object = Scene.objects[i];
+                    
+                    // per object
+                    transforms.calculateModelView();           
+                    transforms.push();
+                    
+                    if (object.alias == 'teapot'){
+                        var t  = transforms.mvMatrix;
+                        mat4.rotate(t, angle * Math.PI / 180, [0, 1, 0]);
+                    }
+
+                    transforms.setMatrixUniforms();
+                    transforms.pop();
+
+
+                    //Setting uniforms
+                    gl.uniform4fv(prg.uMaterialDiffuse, object.diffuse);
+                    gl.uniform1i(prg.uWireframe,object.wireframe);
+                    gl.uniform1i(prg.uPerVertexColor, object.perVertexColor);
+                    
+                    //Setting attributes
+                    gl.enableVertexAttribArray(prg.aVertexPosition);
+                    gl.disableVertexAttribArray(prg.aVertexNormal);
+                    gl.disableVertexAttribArray(prg.aVertexColor);
+                    
+                    gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
+                    gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+                    gl.enableVertexAttribArray(prg.aVertexPosition);
+                    
+                    if(!object.wireframe){
+                        gl.bindBuffer(gl.ARRAY_BUFFER, object.nbo);
+                        gl.vertexAttribPointer(prg.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+                        gl.enableVertexAttribArray(prg.aVertexNormal);
+                    }
+                    
+                    if (object.perVertexColor){
+                        gl.bindBuffer(gl.ARRAY_BUFFER, object.cbo);
+                        gl.vertexAttribPointer(prg.aVertexColor,4,gl.FLOAT, false, 0,0);
+                        gl.enableVertexAttribArray(prg.aVertexColor);
+                    }
+                    
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
+                    
+                    if (object.wireframe){
+                        gl.drawElements(gl.LINES, object.indices.length, gl.UNSIGNED_SHORT,0);
+                    }
+                    else{
+                        gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+                    }
+                    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+                    
+                }
+            }
+            catch(err){
+                alert(err);
+                console.error(err.description);
+            }
+        }
+        
+        var dx_sphere = 0.1;
+        var pos_sphere = 0;
+
+        var frequency = 5; 
+        var elapsedTime = undefined;
+        var initialTime = undefined;
+        var lastTime = 0;
+        var animateFlag = true;
+        var angle =60;
+
+        function animate(){
+            var timeNow = new Date().getTime();
+            if (lastTime != 0) {
+                var elapsed = timeNow - lastTime;
+                if (animateFlag) angle += (90 * elapsed) / 10000.0;
+            }
+            lastTime = timeNow;
+            
+            draw();
+        }
+
+        function startAnimation(){
+            initialTime = (new Date).getTime();
+            setInterval(onFrame,frequency/1000);
+        }
+
+        function onFrame(){
+            elapsedTime = (new Date).getTime() - initialTime;
+            if (elapsedTime < frequency) return; //come back later!
+            
+            var steps = Math.floor(elapsedTime / frequency);
+            while(steps > 0){
+                animate();
+                steps -= 1;
+            }
+            initialTime = (new Date).getTime();
+        }
+        /**
+        * Entry point. This function is invoked when the page is loaded
+        */
+        var app = null;
+        function runWebGLApp() {
+            app = new WebGLApp("canvas-element-id")
+            app.configureGLHook = configure;
+            app.loadSceneHook   = load;
+            app.drawSceneHook   = draw;
+            app.run();
+        
+            startAnimation();
+        }
+        </script>
+
+
+</head>
+
+<body onLoad='runWebGLApp()'>
+    <header>
+        <span style="color:#722121;">CODE</span>REACTORY
+    </header>
+    <div class="main-container">    
+        <div class="background">
+            <canvas id="canvas-element-id">
+            Your browser does not support HTML5
+        </div>
+        <div class="announcer">
+            <h3>Under Construction</h3>
+            <div class="announcer-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In laoreet odio justo. Integer accumsan lobortis massa. Etiam urna elit, vehicula a rutrum a, feugiat sit amet nulla. Nam eu tortor pretium enim congue convallis varius sit amet ligula. Vestibulum pulvinar ut metus et blandit. Vivamus vitae lacus eget justo commodo accumsan a ut velit. Sed pellentesque maximus ante, non gravida nisi vulputate vestibulum.</div>
+        </div>
+    </div>
+    <footer>
+        <p>CodeReactory &copy;2017</p>
+    </footer>
+</body>
+
+</html>
