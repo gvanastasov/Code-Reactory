@@ -3,6 +3,7 @@ const configPath = './src/gulp/config.js';
 var gulp         = require('gulp'),
     sass         = require('gulp-sass'),
     autoprefixer = require('gulp-autoprefixer'),
+    rename       = require('gulp-rename'),
     config       = require(configPath);
 
 var plugins = require('gulp-load-plugins')();
