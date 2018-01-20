@@ -10,5 +10,8 @@ module.exports = {
             dist: './dist/'
         }
     },
+    filenames: {
+        externalsBundle: 'vendors.js'
+    },
     vendors: ['vue', 'gl-matrix']
 }

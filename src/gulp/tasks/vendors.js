@@ -20,7 +20,7 @@ module.exports = function(gulp, plugins){
     config.vendors.forEach(lib => { bundle.require(lib) });
 
     bundle.bundle()
-    .pipe(source('vendor.js'))
+    .pipe(source(config.filenames.externalsBundle))
     .pipe(buffer())
     .pipe(plugins.sourcemaps.init({loadMaps: true}))
     .pipe(plugins.sourcemaps.write('./maps'))
