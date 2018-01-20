@@ -1,7 +1,9 @@
+const configPath = './src/gulp/config.js';
+
 var gulp         = require('gulp'),
     sass         = require('gulp-sass'),
     autoprefixer = require('gulp-autoprefixer'),
-    config       = require('./js/gulp/config.js');
+    config       = require(configPath);
 
 var plugins = require('gulp-load-plugins')();
 
@@ -14,7 +16,7 @@ gulp.task('watch-js', function(){
     gulp.watch(config.paths.js.src + '**/*.js', ['scripts']);
 });
 gulp.task('watch-sass', function(){
-    gulp.watch(config.paths.sass.src + '**/*.{sass,scss}', ['sass']);
+    gulp.watch(config.paths.css.src + '**/*.{sass,scss}', ['sass']);
 });
 gulp.task('watch', ['watch-js', 'watch-sass']);
 
