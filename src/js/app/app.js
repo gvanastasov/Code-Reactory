@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import WebGL from './components/webgl.vue';
+import WebGL from './components/web-gl.vue';
 
 var app = new Vue({
     el: '#app',
