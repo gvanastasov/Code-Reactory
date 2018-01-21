@@ -1,6 +1,6 @@
 module.exports = {
     paths: {
-        tasks: './src/gulp/tasks/',
+        tasks: './src/js/gulp/tasks/',
         js: {
             src: './src/js/',
             dist: './dist/'

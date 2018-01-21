@@ -1,4 +1,4 @@
-const configPath = './src/gulp/config.js';
+const configPath = './src/js/gulp/config.js';
 
 var config     = require(configPath),
     gulp       = require('gulp'),
@@ -15,7 +15,7 @@ var config     = require(configPath),
 var plugins = require('gulp-load-plugins')();
 
 gulp.task('default', ['build'], function() {
-    gulp.start('watch', 'webserver');
+    return gulp.start('webserver', 'watch');
 });
 
 gulp.task('build', ['clean'], function(){
@@ -29,7 +29,7 @@ gulp.task('watch', function(){
     gulp.watch(config.paths.js.src + '**/*.js', ['app']);
     gulp.watch(config.paths.css.src + '**/*.{sass,scss}', ['sass']);
     
-    gulp.watch(['dist/**']).on('change', livereload.changed);
+    gulp.watch(['./dist/**']).on('change', livereload.changed);
 });
 
 // todo: put in a file
