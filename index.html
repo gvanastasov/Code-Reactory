@@ -10,8 +10,17 @@
 </head>
 <body>
     <div id="app">
-        <web-gl :width="800"
-                :height="600"></web-gl>
+        <web-gl inline-template>
+            <div>
+                <canvas>
+                        Your browser does not support HTML5
+                </canvas>
+                <scene>
+                    <div>parent scene</div>
+                    <quad></quad>
+                </scene>
+            </div>
+        </web-gl>
     </div>
     <script type="application/javascript" src="/dist/app.js"></script>
 </body>

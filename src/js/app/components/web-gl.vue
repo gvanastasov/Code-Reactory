@@ -1,15 +1,15 @@
-<template>
-    <div>
-        <canvas :width="width" :height="height">
-            Your browser does not support HTML5
-        </canvas>
-    </div>
-</template>
-
 <script>
+import scene from './scene.vue';
+import quad from './quad.vue';
+
 export default {
-    name: 'webgl',
+    name: 'web-gl',
     
+    components: {
+        scene,
+        quad
+    },
+
     props: {
         width: {
             type: Number,
@@ -19,6 +19,11 @@ export default {
             type: Number,
             default: 600
         }
+    },
+
+    webgl: {
+        a: 1,
+        b: 2
     },
 
     data: function() {

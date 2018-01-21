@@ -1,6 +1,7 @@
 const configPath = '../config.js';
 
 var config     = require(configPath),
+    gutil      = require('gulp-util'),
     browserify = require('browserify'),
     vueify     = require('vueify'),
     babelify   = require('babelify'),
@@ -18,8 +19,8 @@ module.exports = function(gulp, plugins){
     })
     .external(config.vendors)
     .bundle()
-    .on('error', function(error){
-        plugins.gutil.log("Browserify Error", plugins.gutil.colors.red(err.message))
+    .on('error', function(err){
+        gutil.log("Browserify Error", gutil.colors.red(err.message))
     })
     .pipe(source('app.js'))
     .pipe(gulp.dest(config.paths.js.dist));
