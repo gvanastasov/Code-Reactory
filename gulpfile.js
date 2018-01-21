@@ -15,7 +15,7 @@ var config     = require(configPath),
 var plugins = require('gulp-load-plugins')();
 
 gulp.task('default', ['build'], function() {
-    return gulp.start('webserver', 'watch');
+    return gulp.start('watch');
 });
 
 gulp.task('build', ['clean'], function(){
@@ -26,10 +26,12 @@ gulp.task('build', ['clean'], function(){
 gulp.task('watch', function(){
     livereload.listen();
     
-    gulp.watch(config.paths.js.src + '**/*.js', ['app']);
+    gulp.watch(config.paths.js.src + '**/*.{js,vue}', ['app']);
     gulp.watch(config.paths.css.src + '**/*.{sass,scss}', ['sass']);
     
-    gulp.watch(['./dist/**']).on('change', livereload.changed);
+    gulp.watch(['./dist/**', './index.html']).on('change', livereload.changed);
+
+    gulp.start('webserver');
 });
 
 // todo: put in a file

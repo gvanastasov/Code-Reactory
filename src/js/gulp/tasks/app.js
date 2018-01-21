@@ -18,6 +18,9 @@ module.exports = function(gulp, plugins){
     })
     .external(config.vendors)
     .bundle()
+    .on('error', function(error){
+        plugins.gutil.log("Browserify Error", plugins.gutil.colors.red(err.message))
+    })
     .pipe(source('app.js'))
     .pipe(gulp.dest(config.paths.js.dist));
 }
