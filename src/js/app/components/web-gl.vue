@@ -2,9 +2,23 @@
 import scene from './scene.vue';
 import quad from './quad.vue';
 
+const contextOptions = [
+    'webgl',
+    'experimental-webgl',
+    'webkit-3d',
+    'moz-webgl'
+];
+
+var gl = {
+    ctx: null,
+    clearColor: function() {
+        return this.ctx.COLOR_CLEAR_VALUE;
+    }
+}
+
 export default {
     name: 'web-gl',
-    
+    gl,
     components: {
         scene,
         quad
@@ -21,11 +35,6 @@ export default {
         }
     },
 
-    webgl: {
-        a: 1,
-        b: 2
-    },
-
     data: function() {
         return {
             elements: {
@@ -33,17 +42,13 @@ export default {
             },
             gl: null,
             glContextName: '',
-            contextOptions: [
-                'webgl',
-                'experimental-webgl',
-                'webkit-3d',
-                'moz-webgl'
-            ],
             available: false
         };
     },
 
     mounted: function() {
+        console.log('webgl element mounted');
+
         this.elements.canvas = this.$el.querySelector('canvas');
 
         if(this.elements.canvas == null){
@@ -57,19 +62,30 @@ export default {
             console.warn('WebGL is not available');
         } else {
             this.available = true;
+
+            this.$store.dispatch('initWebGL', this.gl);
+            this.$gl.c = this.gl;
+
+            this.$bus.$emit('my-event', this.gl);
             console.log('WebGL context initialized...');
         }
+        console.log(this.$gl);
+
     },
 
     created: function() {
+        // from chapter 1
         window.addEventListener('keypress', this._changeClearColor, false);
+
+        console.log('webgl element created');
+        
     },
 
     methods: {
         _getGlContext: function() {
             var gl = null;
-            for(var i = 0; i < this.contextOptions.length; i++) {
-                var name = this.contextOptions[i];
+            for(var i = 0; i < contextOptions.length; i++) {
+                var name = contextOptions[i];
                 try {
                     gl = this.elements.canvas.getContext(name);    
                 } catch (e) {

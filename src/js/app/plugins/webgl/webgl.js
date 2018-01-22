@@ -1,18 +1,33 @@
 export default {
     install : function (Vue, options) {
-        const version = Number(Vue.version.split('.')[0]);
-        Vue.mixin({ beforeCreate: webgl })
+        Vue.mixin({ beforeMount: registerGL });
 
-        function webgl() {
+        function registerGL() {
             const options = this.$options;
 
             // injection
-            if (options.webgl) {
-                this.$webgl = typeof options.webgl === 'function' 
-                    ? options.webgl() 
-                    : options.webgl;
-            } else if (options.parent && options.parent.$webgl) {
-                this.$webgl = options.parent.$webgl
+            if (options.gl) {
+                console.log('assign gl');
+                
+                options.gl.init = new Event('_gl_init');
+
+                this.$gl = options.gl;
+
+                Object.defineProperty(this.$gl, 'c', {
+                    get: function() {
+                        console.log('get the ctx');
+                        return this.ctx;
+                    },
+                    set: function(x) {
+                        console.log('setting the ctx');
+                        this.ctx = x;
+                    }
+                });
+
+
+            } else if (options.parent && options.parent.$gl) {
+                console.log('inject gl');
+                this.$gl = options.parent.$gl;
             }
         }
     }

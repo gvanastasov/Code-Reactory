@@ -6,7 +6,8 @@ var config     = require(configPath),
     vueify     = require('vueify'),
     babelify   = require('babelify'),
     envify     = require('envify/custom'),
-    source     = require('vinyl-source-stream');
+    source     = require('vinyl-source-stream')
+    buffer     = require('vinyl-buffer');
 
 module.exports = function(gulp, plugins){
     browserify({
@@ -23,5 +24,8 @@ module.exports = function(gulp, plugins){
         gutil.log("Browserify Error", gutil.colors.red(err.message))
     })
     .pipe(source('app.js'))
+    .pipe(buffer())
+    .pipe(plugins.sourcemaps.init({loadMaps: true}))
+    .pipe(plugins.sourcemaps.write('./maps'))
     .pipe(gulp.dest(config.paths.js.dist));
 }

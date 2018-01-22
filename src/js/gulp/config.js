@@ -13,5 +13,5 @@ module.exports = {
     filenames: {
         externalsBundle: 'vendors.js'
     },
-    vendors: ['vue', 'gl-matrix']
+    vendors: ['vue', 'vuex', 'gl-matrix']
 }
