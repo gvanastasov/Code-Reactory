@@ -1,9 +1,9 @@
 import Vue from 'vue';
+
 import Vuex from 'vuex';
+import webglplugin from './plugins/webgl/webgl.js';
 
 import WebGL from './components/web-gl.vue';
-import webglplugin from './plugins/webgl/webgl.js';
-Vue.use(webglplugin);
 
 import StoreObj from './store/store.js';
 
@@ -12,15 +12,7 @@ Vue.use(Vuex);
 Vue.config.debug = true;
 Vue.config.devTools = true;
 
-const EventBus = new Vue()
-
-Object.defineProperties(Vue.prototype, {
-  $bus: {
-    get: function () {
-      return EventBus
-    }
-  }
-})
+Vue.use(webglplugin);
 
 var app = new Vue({
     el: '#app',

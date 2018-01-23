@@ -13,7 +13,6 @@ export default {
     },
 
     mounted: function(){
-        console.log('scene mounted');
     }
 }
 </script>
