@@ -38,14 +38,24 @@ utilsObject.prototype.requestAnimFrame = function(o){
 }
 
 utilsObject.prototype.requestAnimFrame = (function() {
-return window.requestAnimationFrame ||
-     window.webkitRequestAnimationFrame ||
-     window.mozRequestAnimationFrame ||
-     window.oRequestAnimationFrame ||
-     window.msRequestAnimationFrame ||
-     function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-       window.setTimeout(callback, 1000/60);
-     };
+
+    if(window.requestAnimationFrame){
+        return window.requestAnimationFrame;
+    }
+
+    var crossBrowserPrefixes = ['webkit', 'moz', 'o', 'ms'];
+
+    for(var i = 0; i < crossBrowserPrefixes.length; i++){
+        var animFrameKey = crossBrowserPrefixes[i] + 'RequestAnimationFrame';
+
+        if(window[animFrameKey]){
+            return window[animFrameKey];
+        }
+    }
+
+    return function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
+        window.setTimeout(callback, 1000/60);
+    };
 })();
 
 export default {
