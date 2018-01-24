@@ -5,29 +5,19 @@
 </template>
 
 <script>
+import shaders from '../plugins/webgl/shaders.js'
 
 var utils = new utilsObject();
 	
 function utilsObject(){}
-utilsObject.prototype.getShader = function(gl, id) {
-   var script = document.getElementById(id);
-   if (!script) {
-       return null;
-   }
+utilsObject.prototype.getShader = function(gl, t) {
 
-    var str = "";
-    var k = script.firstChild;
-    while (k) {
-        if (k.nodeType == 3) {
-            str += k.textContent;
-        }
-        k = k.nextSibling;
-    }
+    var str = shaders.default[t];
 
     var shader;
-    if (script.type == "x-shader/x-fragment") {
+    if (t == "frag") {
         shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (script.type == "x-shader/x-vertex") {
+    } else if (t == "vert") {
         shader = gl.createShader(gl.VERTEX_SHADER);
     } else {
         return null;
@@ -135,8 +125,8 @@ export default {
         },
         _init_program(){
             var gl = this.$ctx.gl;
-            var fgShader = utils.getShader(gl, "shader-fs");
-            var vxShader = utils.getShader(gl, "shader-vs");
+            var fgShader = utils.getShader(gl, "frag");
+            var vxShader = utils.getShader(gl, "vert");
 
             var prg = gl.createProgram();
             gl.attachShader(prg, vxShader);
@@ -156,8 +146,6 @@ export default {
 
             this.$ctx.prg = prg;
         }
-
-        
     }
 }
 </script>

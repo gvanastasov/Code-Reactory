@@ -35,6 +35,7 @@
     "vueify": "^9.4.1"
   },
   "dependencies": {
+    "fs": "0.0.1-security",
     "gl-matrix": "^2.4.0",
     "vue": "^2.5.13",
     "vuex": "^3.0.1"

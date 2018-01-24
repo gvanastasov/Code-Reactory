@@ -66,3 +66,34 @@ gulp.task('sass', function(){
 function getTask(name) {
     return require(config.paths.tasks + name)(gulp, plugins);
 }
+
+
+
+
+
+
+
+
+// TODO create shader library
+// {
+//     default: {
+//         vert: string,
+//         frag: string
+//     },
+//     etc...
+// }
+
+var fs = require('fs');
+
+gulp.task('shaders', function(){
+    var shaders = {};
+
+    shaders.default = {
+        vert:  fs.readFileSync("./src/js/app/plugins/webgl/shaders/vert.glsl", "utf8"),
+        frag:  fs.readFileSync("./src/js/app/plugins/webgl/shaders/frag.glsl", "utf8")
+    }
+
+    var result = 'export default ' + JSON.stringify(shaders);
+    fs.writeFileSync('./dist/shaders.js', result);
+});
+

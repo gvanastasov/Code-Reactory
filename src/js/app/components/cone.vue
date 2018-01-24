@@ -6,6 +6,7 @@
 
 <script>
 
+
 	var utils = new utilsObject();
 	
 	function utilsObject(){}

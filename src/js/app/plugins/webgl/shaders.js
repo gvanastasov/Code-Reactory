@@ -1,0 +1,1 @@
+export default {"default":{"vert":"attribute vec3 aVertexPosition;\r\n\r\nvoid main(void) {\r\n    gl_Position = vec4(aVertexPosition,1.0); \r\n}","frag":"#ifdef GL_ES\r\nprecision highp float;\r\n#endif\r\nvoid main(void) {\r\n    gl_FragColor = vec4(0.5,0.5,1.0, 1.0);\r\n}"}}
