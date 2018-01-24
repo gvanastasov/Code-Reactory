@@ -11,10 +11,10 @@ var _ctxObject = {
 
     clearWithColor: function(color) {
         this.gl.clearColor(
-            Math.round(color[0]*10)/10,
-            Math.round(color[1]*10)/10,
-            Math.round(color[2]*10)/10,
-            Math.round(color[3]*10)/10);
+            Math.round(color[0]*100)/100,
+            Math.round(color[1]*100)/100,
+            Math.round(color[2]*100)/100,
+            Math.round(color[3]*100)/100);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     }
 }
