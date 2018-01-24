@@ -1,3 +1,5 @@
+
+
 import Vue from 'vue';
 
 import Vuex from 'vuex';
@@ -24,3 +26,6 @@ var app = new Vue({
         console.log('application mounted.');
     }
 });
+
+
+

@@ -19,20 +19,12 @@ var _ctxObject = {
     }
 }
 
-_ctxObject.requestAnimFrame = (function() {
-    return window.requestAnimationFrame ||
-         window.webkitRequestAnimationFrame ||
-         window.mozRequestAnimationFrame ||
-         window.oRequestAnimationFrame ||
-         window.msRequestAnimationFrame ||
-         function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-           window.setTimeout(callback, 1000/60);
-         };
-})();
 
-_ctxObject.renderLoop = function(draw) {
-    this.requestAnimFrame(this.renderLoop);
-    draw();
+_ctxObject.renderLoop = function(draw, utils) {
+    console.log(this);
+    
+    utils.requestAnimFrame(this.renderLoop);
+    console.log('frame');
 }
 
 Object.defineProperty(_ctxObject, 'clearColor', {

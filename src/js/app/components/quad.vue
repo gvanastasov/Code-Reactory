@@ -6,58 +6,57 @@
 
 <script>
 
-	var utils = new utilsObject();
+var utils = new utilsObject();
 	
-	function utilsObject(){}
+function utilsObject(){}
 utilsObject.prototype.getShader = function(gl, id) {
-       var script = document.getElementById(id);
-       if (!script) {
-           return null;
-       }
+   var script = document.getElementById(id);
+   if (!script) {
+       return null;
+   }
 
-		var str = "";
-		var k = script.firstChild;
-        while (k) {
-            if (k.nodeType == 3) {
-                str += k.textContent;
-            }
-            k = k.nextSibling;
+    var str = "";
+    var k = script.firstChild;
+    while (k) {
+        if (k.nodeType == 3) {
+            str += k.textContent;
         }
-
-        var shader;
-        if (script.type == "x-shader/x-fragment") {
-            shader = gl.createShader(gl.FRAGMENT_SHADER);
-        } else if (script.type == "x-shader/x-vertex") {
-            shader = gl.createShader(gl.VERTEX_SHADER);
-        } else {
-            return null;
-        }
-
-        gl.shaderSource(shader, str);
-        gl.compileShader(shader);
-
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            alert(gl.getShaderInfoLog(shader));
-            return null;
-        }
-        return shader;
+        k = k.nextSibling;
     }
-	
-	utilsObject.prototype.requestAnimFrame = function(o){
-		requestAnimFrame(o);
+
+    var shader;
+    if (script.type == "x-shader/x-fragment") {
+        shader = gl.createShader(gl.FRAGMENT_SHADER);
+    } else if (script.type == "x-shader/x-vertex") {
+        shader = gl.createShader(gl.VERTEX_SHADER);
+    } else {
+        return null;
     }
-    
-    utils.requestAnimFrame = (function() {
-    return window.requestAnimationFrame ||
-         window.webkitRequestAnimationFrame ||
-         window.mozRequestAnimationFrame ||
-         window.oRequestAnimationFrame ||
-         window.msRequestAnimationFrame ||
-         function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-           window.setTimeout(callback, 1000/60);
-         };
-    })();
-    
+
+    gl.shaderSource(shader, str);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+        return null;
+    }
+    return shader;
+}
+
+utilsObject.prototype.requestAnimFrame = function(o){
+    requestAnimFrame(o);
+}
+
+utilsObject.prototype.requestAnimFrame = (function() {
+return window.requestAnimationFrame ||
+     window.webkitRequestAnimationFrame ||
+     window.mozRequestAnimationFrame ||
+     window.oRequestAnimationFrame ||
+     window.msRequestAnimationFrame ||
+     function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
+       window.setTimeout(callback, 1000/60);
+     };
+})();
 
 export default {
     name: 'quad',
@@ -82,12 +81,39 @@ export default {
 
     methods: {
         gl_init: function($event) {
+            
+
             console.log('cone gl init callback');
             this._init_program();
             this._init_buffers();
-            this.$ctx.renderLoop(this.draw());
+            this.renderLoop();
+            //this.$ctx.renderLoop(this.draw, utils);
+        },
+        renderLoop: function (){
+            utils.requestAnimFrame.call(window, this.renderLoop);
+            this.draw();
         },
 
+        draw: function(){
+            var gl = this.$ctx.gl;
+            var prg = this.$ctx.prg;
+
+            var c_width = 800;
+            var c_height = 500;
+
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.enable(gl.DEPTH_TEST);
+        
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.viewport(0,0,c_width, c_height);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.VBO);
+            gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(prg.vertexPosition);
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.IBO);
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT,0);
+        },
         _init_buffers: function(){
             var gl = this.$ctx.gl;
 
@@ -110,47 +136,28 @@ export default {
         _init_program(){
             var gl = this.$ctx.gl;
             var fgShader = utils.getShader(gl, "shader-fs");
-		var vxShader = utils.getShader(gl, "shader-vs");
+            var vxShader = utils.getShader(gl, "shader-vs");
 
-		var prg = gl.createProgram();
-		gl.attachShader(prg, vxShader);
-		gl.attachShader(prg, fgShader);
-		gl.linkProgram(prg);
+            var prg = gl.createProgram();
+            gl.attachShader(prg, vxShader);
+            gl.attachShader(prg, fgShader);
+            gl.linkProgram(prg);
 
-		if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
-			alert("Could not initialise shaders");
-		}
+            if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
+                alert("Could not initialise shaders");
+            }
 
-		gl.useProgram(prg);
+            gl.useProgram(prg);
 
-		//The following lines allow us obtaining a reference to the uniforms and attributes defined in the shaders.
-		//This is a necessary step as the shaders are NOT written in JavaScript but in a 
-		//specialized language called GLSL. More about this on chapter 3.
-		prg.vertexPosition = gl.getAttribLocation(prg, "aVertexPosition");
+            //The following lines allow us obtaining a reference to the uniforms and attributes defined in the shaders.
+            //This is a necessary step as the shaders are NOT written in JavaScript but in a 
+            //specialized language called GLSL. More about this on chapter 3.
+            prg.vertexPosition = gl.getAttribLocation(prg, "aVertexPosition");
 
             this.$ctx.prg = prg;
-        },
-
-        draw: function(){
-            var gl = this.$ctx.gl;
-            var prg = this.$ctx.prg;
-
-            var c_width = 800;
-            var c_height = 500;
-
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            gl.enable(gl.DEPTH_TEST);
-        
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            gl.viewport(0,0,c_width, c_height);
-            
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.VBO);
-            gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(prg.vertexPosition);
-            
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.IBO);
-            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT,0);
         }
+
+        
     }
 }
 </script>

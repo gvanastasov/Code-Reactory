@@ -103,10 +103,10 @@ export default {
             console.log('cone gl init callback');
             this._init_program();
             this._init_buffers();
-            renderLoop();
+            this.renderLoop();
         },
         renderLoop: function (){
-            utils.requestAnimFrame(this.renderLoop);
+            utils.requestAnimFrame.call(window, this.renderLoop);
             draw();
         },
 
