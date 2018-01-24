@@ -19,6 +19,22 @@ var _ctxObject = {
     }
 }
 
+_ctxObject.requestAnimFrame = (function() {
+    return window.requestAnimationFrame ||
+         window.webkitRequestAnimationFrame ||
+         window.mozRequestAnimationFrame ||
+         window.oRequestAnimationFrame ||
+         window.msRequestAnimationFrame ||
+         function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
+           window.setTimeout(callback, 1000/60);
+         };
+})();
+
+_ctxObject.renderLoop = function(draw) {
+    this.requestAnimFrame(this.renderLoop);
+    draw();
+}
+
 Object.defineProperty(_ctxObject, 'clearColor', {
     get: function(){
         return this.gl.getParameter(this.gl.COLOR_CLEAR_VALUE);

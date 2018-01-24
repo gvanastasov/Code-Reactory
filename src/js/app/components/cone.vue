@@ -60,17 +60,35 @@ utilsObject.prototype.getShader = function(gl, id) {
     
 
 export default {
-    name: 'quad',
+    name: 'cone',
 
     data: function(){
         return {
             vertices: [
-                -0.5,0.5,0.0, 	//Vertex 0
-		-0.5,-0.5,0.0, 	//Vertex 1
-		0.5,-0.5,0.0, 	//Vertex 2
-		0.5,0.5,0.0 	//Vertex 3
+                1.5, 0, 0, 
+                -1.5, 1, 0, 
+                -1.5, 0.809017,  0.587785,
+                -1.5, 0.309017,  0.951057, 
+                -1.5, -0.309017, 0.951057, 
+                -1.5, -0.809017, 0.587785,
+                -1.5, -1, 0.0, 
+                -1.5, -0.809017, -0.587785,
+                -1.5, -0.309017, -0.951057, 
+                -1.5, 0.309017,  -0.951057, 
+                -1.5, 0.809017,  -0.587785
             ],
-            indices: [3,2,1,3,1,0],
+            indices: [
+                0, 1, 2,
+                0, 2, 3,
+                0, 3, 4,
+                0, 4, 5,
+                0, 5, 6,
+                0, 6, 7,
+                0, 7, 8,
+                0, 8, 9,
+                0, 9, 10,
+                0, 10, 1
+            ],
             buffers: {
                 VBO: null, // Vertex Buffer Object
                 IBO: null  // Index Buffer Object
@@ -85,7 +103,11 @@ export default {
             console.log('cone gl init callback');
             this._init_program();
             this._init_buffers();
-            this.$ctx.renderLoop(this.draw());
+            renderLoop();
+        },
+        renderLoop: function (){
+            utils.requestAnimFrame(this.renderLoop);
+            draw();
         },
 
         _init_buffers: function(){
@@ -109,24 +131,23 @@ export default {
         },
         _init_program(){
             var gl = this.$ctx.gl;
-            var fgShader = utils.getShader(gl, "shader-fs");
-		var vxShader = utils.getShader(gl, "shader-vs");
+            var frag = utils.getShader(gl, 'shader-fs');
+            var vert = utils.getShader(gl, 'shader-vs');
 
-		var prg = gl.createProgram();
-		gl.attachShader(prg, vxShader);
-		gl.attachShader(prg, fgShader);
-		gl.linkProgram(prg);
+            var prg = gl.createProgram();
+            gl.attachShader(prg, frag);
+            gl.attachShader(prg, frag);
+            gl.linkProgram(prg);
 
-		if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
-			alert("Could not initialise shaders");
-		}
+            if(!gl.getProgramParameter(prg, gl.LINK_STATUS)){
+                console.error('could not initialize shaders');
+            }
 
-		gl.useProgram(prg);
+            gl.useProgram(prg);
 
-		//The following lines allow us obtaining a reference to the uniforms and attributes defined in the shaders.
-		//This is a necessary step as the shaders are NOT written in JavaScript but in a 
-		//specialized language called GLSL. More about this on chapter 3.
-		prg.vertexPosition = gl.getAttribLocation(prg, "aVertexPosition");
+            prg.vertexPositionAttribute = gl.getAttribLocation(prg, 'aVertexPosition');
+            prg.pMatrixUniform = gl.getUniformLocation(prg, 'uPMatrix');
+            prg.mvMatrixUniform = gl.getUniformLocation(prg, 'uMVMatrix');
 
             this.$ctx.prg = prg;
         },
@@ -135,21 +156,25 @@ export default {
             var gl = this.$ctx.gl;
             var prg = this.$ctx.prg;
 
-            var c_width = 800;
-            var c_height = 500;
-
             gl.clearColor(0.0, 0.0, 0.0, 1.0);
             gl.enable(gl.DEPTH_TEST);
-        
+
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            gl.viewport(0,0,c_width, c_height);
-            
+            gl.viewport(0, 0, 800, 600);
+
+            mat4.perspective(45, 800 / 600, 0.1, 10000.0, this.pMatrix);
+            mat4.identity(this.mvMatrix);	
+            mat4.translate(this.mvMatrix, [0.0, 0.0, -5.0]);
+
+            gl.uniformMatrix4fv(prg.pMatrixUniform, false, this.pMatrix);
+            gl.uniformMatrix4fv(prg.mvMatrixUniform, false, this.mvMatrix);
+
             gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.VBO);
             gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(prg.vertexPosition);
-            
+            gl.enableVertexAttribArray(prg.vertexPositionAttribute);
+
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.IBO);
-            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT,0);
+            gl.drawElements(gl.LINE_LOOP, this.indices.length, gl.UNSIGNED_SHORT,0);
         }
     }
 }

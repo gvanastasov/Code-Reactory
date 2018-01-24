@@ -1,13 +1,15 @@
 <script>
 import scene from './scene.vue';
 import quad from './quad.vue';
+import cone from './cone.vue';
 
 export default {
     name: 'web-gl',
 
     components: {
         scene,
-        quad
+        quad,
+        cone
     },
 
     props: {
