@@ -15,10 +15,10 @@ export default {
             })
         })();
 
-        Vue.mixin({ beforeMount: registerGL });
+        Vue.mixin({ beforeMount: injectContext });
 
         // todo: arguments check, warnings and etc.
-        function registerGL() {
+        function injectContext() {
             const options = this.$options;
             
             // injection
