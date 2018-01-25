@@ -1,15 +1,11 @@
 <script>
-import scene from './scene.vue';
 import quad from './quad.vue';
-import cone from './cone.vue';
 
 export default {
-    name: 'web-gl',
+    name: 'scene',
 
     components: {
-        scene,
         quad,
-        cone
     },
 
     props: {
@@ -47,14 +43,12 @@ export default {
             this.$ctx.gl = gl;
             this.$ctx.available = true;
 
+            this.$ctx.width = this.width;
+            this.$ctx.height = this.height;
+
             this.$bus.$emit('_gl_init', this.$ctx.gl);
             console.log('WebGL context initialized...');
         }
-    },
-
-    created: function() {
-        // from chapter 1
-        window.addEventListener('keypress', this._changeClearColor, false);
     },
 
     methods: {
@@ -73,33 +67,6 @@ export default {
                 }
             }
             return gl;
-        },
-
-        _clear: function() {
-            this.$ctx.gl.clearColor(0.3, 0.7, 0.2, 1.0);
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-            this.gl.viewport(0, 0, this.width, this.height);
-        },
-
-        _changeClearColor: function(e) {
-            if(e.keyCode){
-                switch(e.keyCode){
-                    case 49: { // 1
-                        var greenish = vec4.fromValues(0.3, 0.7, 0.2, 1.0);
-                        this.$ctx.clearWithColor(greenish);
-                        break;
-                    }
-                    case 50: { // 2
-                        var blueish = vec4.fromValues(0.7, 0.3, 0.2, 1.0);
-                        this.$ctx.clearWithColor(blueish);
-                        break;
-                    }
-                    case 51: { // 3
-                        console.log('clear color = ' + this.$ctx.clearColor);
-                        break;
-                    }
-                }
-            }
         }
     }
 };

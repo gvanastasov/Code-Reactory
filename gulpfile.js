@@ -10,7 +10,8 @@ var config     = require(configPath),
     babelify   = require('babelify'),
     envify     = require('envify/custom'),
     source     = require('vinyl-source-stream'),
-    clean      = require('gulp-rimraf');
+    clean      = require('gulp-rimraf'),
+    fs         = require('fs');
 
 var plugins = require('gulp-load-plugins')();
 
@@ -67,33 +68,15 @@ function getTask(name) {
     return require(config.paths.tasks + name)(gulp, plugins);
 }
 
-
-
-
-
-
-
-
-// TODO create shader library
-// {
-//     default: {
-//         vert: string,
-//         frag: string
-//     },
-//     etc...
-// }
-
-var fs = require('fs');
-
 gulp.task('shaders', function(){
     var shaders = {};
 
     shaders.default = {
-        vert:  fs.readFileSync("./src/js/app/plugins/webgl/shaders/vert.glsl", "utf8"),
-        frag:  fs.readFileSync("./src/js/app/plugins/webgl/shaders/frag.glsl", "utf8")
+        vert:  fs.readFileSync("./src/js/plugins/vue-box/shaders/vert.glsl", "utf8"),
+        frag:  fs.readFileSync("./src/js/plugins/vue-box/shaders/frag.glsl", "utf8")
     }
 
     var result = 'export default ' + JSON.stringify(shaders);
-    fs.writeFileSync('./dist/shaders.js', result);
+    fs.writeFileSync('./src/js/plugins/vue-box/shaders.js', result);
 });
 

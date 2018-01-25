@@ -5,58 +5,8 @@
 </template>
 
 <script>
-import shaders from '../plugins/webgl/shaders.js'
 
-var utils = new utilsObject();
-	
-function utilsObject(){}
-utilsObject.prototype.getShader = function(gl, t) {
 
-    var str = shaders.default[t];
-
-    var shader;
-    if (t == "frag") {
-        shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (t == "vert") {
-        shader = gl.createShader(gl.VERTEX_SHADER);
-    } else {
-        return null;
-    }
-
-    gl.shaderSource(shader, str);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
-        return null;
-    }
-    return shader;
-}
-
-utilsObject.prototype.requestAnimFrame = function(o){
-    requestAnimFrame(o);
-}
-
-utilsObject.prototype.requestAnimFrame = (function() {
-
-    if(window.requestAnimationFrame){
-        return window.requestAnimationFrame;
-    }
-
-    var crossBrowserPrefixes = ['webkit', 'moz', 'o', 'ms'];
-
-    for(var i = 0; i < crossBrowserPrefixes.length; i++){
-        var animFrameKey = crossBrowserPrefixes[i] + 'RequestAnimationFrame';
-
-        if(window[animFrameKey]){
-            return window[animFrameKey];
-        }
-    }
-
-    return function(/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-        window.setTimeout(callback, 1000/60);
-    };
-})();
 
 export default {
     name: 'quad',
